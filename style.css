@@ -1445,3 +1445,40 @@ textarea:focus { border-bottom-color: var(--red); }
 #pg-result .r-polaroid-wrap.is-ready .r-polaroid-atlas-note {
   opacity: 1;
 }
+/* ============================================================
+   AUTO-INJECTED: Coca-Cola vintage stamp on polaroid
+   ============================================================ */
+#pg-result .r-polaroid {
+  position: relative;
+}
+
+#pg-result .r-polaroid::after {
+  content: "";
+  position: absolute;
+  top: -14px;
+  right: -12px;
+  width: 90px;
+  height: auto;
+  aspect-ratio: 360 / 687;
+  background-image: url('assets/img/coca-stamp.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+  opacity: 0;
+  transition: opacity 700ms ease 400ms;
+}
+
+#pg-result .r-polaroid.ready::after {
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  #pg-result .r-polaroid::after {
+    width: 72px;
+    top: -10px;
+    right: -8px;
+  }
+}

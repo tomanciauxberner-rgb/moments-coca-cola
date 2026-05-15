@@ -1,17 +1,31 @@
 /* ============================================================
-   Moments Atlas — Polaroid v4
-   - Event delegation on document (no race condition possible)
-   - Retry Pollinations up to 3 times with new seed
-   - Visibility via state class
-   - Download + Send bottle + Atlas note
+   Moments Atlas — Polaroid v5
+   - Event delegation on document
+   - Retry Pollinations up to 3 times
+   - Coca-Cola vintage stamp composited on download canvas
    ============================================================ */
 (function () {
   'use strict';
 
   var POLLINATIONS_BASE = 'https://image.pollinations.ai/prompt/';
-  var NEGATIVE = 'cafe terrace, restaurant interior, bar, modern, stock photo, generic, watermark, text, logo overlay, distorted faces, hands deformed';
+  var NEGATIVE = 'cafe terrace, restaurant interior, bar, modern, stock photo, generic, watermark, text, logo overlay, distorted faces, hands deformed, cartoon, illustration, anime, doll face, plastic skin, AI face';
   var MAX_RETRIES = 3;
   var IMAGE_TIMEOUT_MS = 22000;
+  var STAMP_URL = '/assets/img/coca-stamp.png';
+
+  var stampPromise = null;
+  function loadStamp() {
+    if (stampPromise) return stampPromise;
+    stampPromise = new Promise(function (resolve) {
+      var im = new Image();
+      im.crossOrigin = 'anonymous';
+      im.onload = function () { resolve(im); };
+      im.onerror = function () { resolve(null); };
+      im.src = STAMP_URL;
+    });
+    return stampPromise;
+  }
+  loadStamp();
 
   var currentState = {
     memory: '',
@@ -190,79 +204,101 @@
     return lines;
   }
 
-  function buildDownloadCanvas(callback) {
+  async function buildDownloadCanvas() {
     var img = document.querySelector('#r-polaroid .r-polaroid-img');
-    if (!img || !img.src) { callback(null); return; }
+    if (!img || !img.src) return null;
 
-    var src = new Image();
-    src.crossOrigin = 'anonymous';
-    src.onload = function () {
-      var W = 900;
-      var FRAME = 60;
-      var BOTTOM = 220;
-      var photoW = W - FRAME * 2;
-      var photoH = Math.round((photoW / src.width) * src.height);
-      var H = FRAME + photoH + BOTTOM;
+    var src = await new Promise(function (resolve, reject) {
+      var i = new Image();
+      i.crossOrigin = 'anonymous';
+      i.onload = function () { resolve(i); };
+      i.onerror = reject;
+      i.src = img.src;
+    });
 
-      var canvas = document.createElement('canvas');
-      canvas.width = W;
-      canvas.height = H;
-      var ctx = canvas.getContext('2d');
+    var stamp = await loadStamp();
 
-      ctx.fillStyle = '#fffcf3';
-      ctx.fillRect(0, 0, W, H);
-      ctx.drawImage(src, FRAME, FRAME, photoW, photoH);
+    var W = 900;
+    var FRAME = 60;
+    var BOTTOM = 220;
+    var photoW = W - FRAME * 2;
+    var photoH = Math.round((photoW / src.width) * src.height);
+    var H = FRAME + photoH + BOTTOM;
 
-      var attribution = [currentState.name, currentState.city, currentState.year]
-        .filter(function (x) { return x && x !== 'Toi'; })
-        .join(' · ');
+    var canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    var ctx = canvas.getContext('2d');
 
-      ctx.fillStyle = '#1a1a1a';
-      ctx.font = 'italic 26px Georgia, serif';
-      ctx.textAlign = 'center';
-      var quoteY = FRAME + photoH + 60;
-      var quote = currentState.memory.length > 180
-        ? currentState.memory.slice(0, 177) + '…'
-        : currentState.memory;
-      var lines = wrapText(ctx, '"' + quote + '"', W - 120).slice(0, 3);
-      for (var i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i], W / 2, quoteY + i * 32);
-      }
+    ctx.fillStyle = '#fffcf3';
+    ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(src, FRAME, FRAME, photoW, photoH);
 
-      if (attribution) {
-        ctx.fillStyle = '#7a4a3a';
-        ctx.font = '14px Georgia, serif';
-        ctx.fillText('— ' + attribution.toUpperCase(), W / 2, quoteY + lines.length * 32 + 32);
-      }
+    if (stamp) {
+      var stampW = 180;
+      var stampH = Math.round((stampW / stamp.width) * stamp.height);
+      var stampX = W - stampW - 8;
+      var stampY = -24;
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.35)';
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetY = 6;
+      ctx.drawImage(stamp, stampX, stampY, stampW, stampH);
+      ctx.restore();
+    }
 
-      ctx.fillStyle = 'rgba(0,0,0,0.4)';
-      ctx.font = '10px Helvetica, sans-serif';
-      ctx.fillText('MOMENTS ATLAS', W / 2, H - 24);
+    var attribution = [currentState.name, currentState.city, currentState.year]
+      .filter(function (x) { return x && x !== 'Toi'; })
+      .join(' · ');
 
-      callback(canvas);
-    };
-    src.onerror = function () { callback(null); };
-    src.src = img.src;
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = 'italic 26px Georgia, serif';
+    ctx.textAlign = 'center';
+    var quoteY = FRAME + photoH + 60;
+    var quote = currentState.memory.length > 180
+      ? currentState.memory.slice(0, 177) + '…'
+      : currentState.memory;
+    var lines = wrapText(ctx, '"' + quote + '"', W - 120).slice(0, 3);
+    for (var i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], W / 2, quoteY + i * 32);
+    }
+
+    if (attribution) {
+      ctx.fillStyle = '#7a4a3a';
+      ctx.font = '14px Georgia, serif';
+      ctx.fillText('— ' + attribution.toUpperCase(), W / 2, quoteY + lines.length * 32 + 32);
+    }
+
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.font = '10px Helvetica, sans-serif';
+    ctx.fillText('MOMENTS ATLAS', W / 2, H - 24);
+
+    return canvas;
   }
 
-  function downloadPolaroid() {
-    buildDownloadCanvas(function (canvas) {
-      if (!canvas) { alert('Could not prepare the download.'); return; }
-      canvas.toBlob(function (blob) {
-        if (!blob) { alert('Could not prepare the download.'); return; }
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        var fname = 'moments-atlas';
-        if (currentState.name && currentState.name !== 'Toi') fname += '-' + currentState.name.toLowerCase();
-        if (currentState.year) fname += '-' + currentState.year;
-        a.href = url;
-        a.download = fname.replace(/[^a-z0-9\-]/gi, '') + '.png';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
-      }, 'image/png');
-    });
+  async function downloadPolaroid() {
+    var canvas;
+    try {
+      canvas = await buildDownloadCanvas();
+    } catch (e) {
+      alert('Could not prepare the download.');
+      return;
+    }
+    if (!canvas) { alert('Could not prepare the download.'); return; }
+    canvas.toBlob(function (blob) {
+      if (!blob) { alert('Could not prepare the download.'); return; }
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      var fname = 'moments-atlas';
+      if (currentState.name && currentState.name !== 'Toi') fname += '-' + currentState.name.toLowerCase();
+      if (currentState.year) fname += '-' + currentState.year;
+      a.href = url;
+      a.download = fname.replace(/[^a-z0-9\-]/gi, '') + '.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    }, 'image/png');
   }
 
   function openSendModal() {
@@ -349,7 +385,7 @@
     }
   }
 
-  /* ====== Event delegation on document — bulletproof ====== */
+  /* ====== Event delegation on document ====== */
   document.addEventListener('click', function (e) {
     var t = e.target;
     if (!t || !t.closest) return;
@@ -359,19 +395,16 @@
       downloadPolaroid();
       return;
     }
-
     if (t.closest('#r-action-send')) {
       e.preventDefault();
       openSendModal();
       return;
     }
-
     if (t.closest('#r-send-close') || t.closest('#r-send-close-success')) {
       e.preventDefault();
       closeSendModal();
       return;
     }
-
     if (t.id === 'r-send-modal') {
       closeSendModal();
       return;
@@ -393,5 +426,5 @@
   });
 
   window.__generatePolaroid = generatePolaroid;
-  window.__polaroidV4Loaded = true;
+  window.__polaroidV5Loaded = true;
 })();

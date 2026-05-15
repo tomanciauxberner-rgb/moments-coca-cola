@@ -10,13 +10,19 @@ function isValidEmail(e) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 }
 
-function buildHtml({ recipientName, senderName, memory, personalMessage, city, year, polaroidUrl }) {
+function buildHtml({ recipientName, senderName, memory, personalMessage, city, year, polaroidUrl, stampUrl }) {
   const attribution = [senderName, city, year].filter(Boolean).join(' · ');
   const msgBlock = personalMessage
     ? `<p style="font-style:italic;color:#7a4a3a;border-left:2px solid #c8a070;padding-left:14px;margin:24px 0;font-size:15px;line-height:1.6;">${personalMessage}</p>`
     : '';
-  const imgBlock = polaroidUrl
-    ? `<div style="text-align:center;margin:28px 0;"><img src="${polaroidUrl}" alt="Your memory, developed" style="max-width:300px;width:80%;border:14px solid #fffcf3;border-bottom-width:54px;box-shadow:0 12px 32px rgba(0,0,0,0.25);transform:rotate(-2deg);"/></div>`
+
+  const polaroidBlock = polaroidUrl
+    ? `
+      <div style="position:relative;display:inline-block;margin:0 auto;">
+        <img src="${polaroidUrl}" alt="Your memory, developed" style="display:block;max-width:300px;width:80%;border:14px solid #fffcf3;border-bottom-width:54px;box-shadow:0 12px 32px rgba(0,0,0,0.25);"/>
+        ${stampUrl ? `<img src="${stampUrl}" alt="Coca-Cola" style="position:absolute;top:-12px;right:-10px;width:64px;height:auto;"/>` : ''}
+      </div>
+    `
     : '';
 
   return `<!doctype html>
@@ -30,7 +36,7 @@ function buildHtml({ recipientName, senderName, memory, personalMessage, city, y
           <h1 style="font-size:22px;font-weight:400;font-style:italic;color:#2a1a14;margin:0 0 8px;line-height:1.4;">${recipientName ? `Dear ${recipientName},` : 'Dear friend,'}</h1>
           <p style="font-size:15px;color:#5a3a2a;margin:16px 0 0;line-height:1.6;">Someone wanted you to remember this.</p>
         </td></tr>
-        <tr><td style="padding:0 40px;">${imgBlock}</td></tr>
+        <tr><td align="center" style="padding:0 40px 28px;">${polaroidBlock}</td></tr>
         <tr><td style="padding:0 40px 8px;">
           <blockquote style="font-size:17px;font-style:italic;color:#2a1a14;border-left:3px solid #d4453c;padding-left:18px;margin:0 0 16px;line-height:1.65;">"${memory}"</blockquote>
           <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#9a6a4a;padding-left:21px;">— ${attribution}</div>
@@ -83,9 +89,13 @@ module.exports = async (req, res) => {
     return;
   }
 
+  const proto = (req.headers['x-forwarded-proto'] || 'https');
+  const host = req.headers['host'] || 'moments-coca-cola.vercel.app';
+  const stampUrl = `${proto}://${host}/assets/img/coca-stamp.png`;
+
   const html = buildHtml({
     recipientName, senderName, memory, personalMessage,
-    city, year, polaroidUrl,
+    city, year, polaroidUrl, stampUrl,
   });
 
   const subject = senderName
