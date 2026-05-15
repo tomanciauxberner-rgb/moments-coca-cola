@@ -930,3 +930,150 @@ textarea:focus { border-bottom-color: var(--red); }
   opacity: 0 !important;
 }
 /* ===== END parallax 2-layer ===== */
+/* ============================================================
+   AUTO-INJECTED: polaroid section (memory image)
+   ============================================================ */
+#pg-result .r-section-polaroid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 0 60px;
+}
+
+#pg-result .r-polaroid-wrap {
+  position: relative;
+  width: 320px;
+  max-width: 86vw;
+}
+
+#pg-result .r-polaroid {
+  position: relative;
+  background: #fffcf3;
+  padding: 16px 16px 60px;
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.55),
+    0 6px 18px rgba(0, 0, 0, 0.35);
+  transform: rotate(-2.5deg);
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+#pg-result .r-section-polaroid.revealed .r-polaroid {
+  opacity: 1;
+}
+
+#pg-result .r-polaroid:hover {
+  transform: rotate(-1deg) translateY(-4px);
+}
+
+#pg-result .r-polaroid-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+
+#pg-result .r-polaroid-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#pg-result .r-polaroid.ready .r-polaroid-img {
+  opacity: 1;
+}
+
+#pg-result .r-polaroid-shimmer {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(255, 255, 255, 0) 25%,
+      rgba(255, 255, 255, 0.06) 50%,
+      rgba(255, 255, 255, 0) 75%
+    ),
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 245, 230, 0.05) 0%,
+      rgba(0, 0, 0, 0) 70%
+    );
+  background-size: 220% 100%, 100% 100%;
+  animation: r-shimmer 2.4s ease-in-out infinite;
+  opacity: 1;
+  transition: opacity 800ms ease;
+}
+
+#pg-result .r-polaroid.ready .r-polaroid-shimmer,
+#pg-result .r-polaroid.errored .r-polaroid-shimmer {
+  opacity: 0;
+}
+
+@keyframes r-shimmer {
+  0%   { background-position: -120% 0, 0 0; }
+  100% { background-position: 220% 0, 0 0; }
+}
+
+#pg-result .r-polaroid-label {
+  position: absolute;
+  inset: auto 0 0 0;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.35);
+  padding: 0 16px 18px;
+  font-family: inherit;
+}
+
+#pg-result .r-polaroid-label .r-polaroid-status {
+  font-style: italic;
+  opacity: 0.85;
+  transition: opacity 500ms ease;
+}
+
+#pg-result .r-polaroid.ready .r-polaroid-status {
+  opacity: 0;
+  visibility: hidden;
+  height: 0;
+  display: block;
+  pointer-events: none;
+}
+
+#pg-result .r-polaroid-caption {
+  color: rgba(0, 0, 0, 0.5);
+  font-style: italic;
+  opacity: 0;
+  transition: opacity 800ms ease 400ms;
+}
+
+#pg-result .r-polaroid.ready .r-polaroid-caption {
+  opacity: 1;
+}
+
+#pg-result .r-polaroid-eyebrow {
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(255, 245, 230, 0.55);
+  margin-bottom: 28px;
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+#pg-result .r-section-polaroid.revealed .r-polaroid-eyebrow {
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  #pg-result .r-section-polaroid { padding: 50px 0 40px; }
+  #pg-result .r-polaroid-wrap { width: 260px; }
+  #pg-result .r-polaroid { padding: 12px 12px 48px; transform: rotate(-1.5deg); }
+}

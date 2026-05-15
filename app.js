@@ -283,3 +283,19 @@ window.__revealCascade = function(){
     }, 400 + i * 700);
   });
 };
+
+
+/* ===== AUTO-INJECTED: polaroid hook ===== */
+(function(){
+  var _origShowResult = window.showResult;
+  if (typeof _origShowResult !== 'function') return;
+  window.showResult = function(input, name, city, year){
+    var ret = _origShowResult.apply(this, arguments);
+    try {
+      if (window.__generatePolaroid) {
+        window.__generatePolaroid(input, name || '', city || '', year || '');
+      }
+    } catch(e) {}
+    return ret;
+  };
+})();
