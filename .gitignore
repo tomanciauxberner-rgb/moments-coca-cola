@@ -1,0 +1,10 @@
+.DS_Store
+Thumbs.db
+*.bak_*
+*.backup
+*.tmp
+.vscode/
+.idea/
+*.swp
+node_modules/
+.vercel
