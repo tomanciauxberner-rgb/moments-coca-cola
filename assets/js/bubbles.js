@@ -17,7 +17,7 @@
 
   /* Where the bottle neck sits, in viewport ratios.
      Tuned from the screenshot: neck around 78% from left, 60% from top. */
-  var NECK_X_RATIO = 0.78;
+  var NECK_X_RATIO = 0.75;
   var NECK_Y_RATIO = 0.60;
 
   function init() {
