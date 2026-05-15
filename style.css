@@ -1482,3 +1482,26 @@ textarea:focus { border-bottom-color: var(--red); }
     right: -8px;
   }
 }
+
+/* ============================================================
+   AUTO-INJECTED: mobile bottle visibility fix
+   Source image 1179x895 landscape, bottle centered at 70%x80%.
+   On portrait viewports, object-fit:cover crops the bottle out.
+   Shift object-position so the bottle stays in frame.
+   ============================================================ */
+@media (max-width: 720px) {
+  #pg-result .pg-bg-plate,
+  #pg-result .pg-bg-bottle,
+  #pg-result .pg-bg-image {
+    object-position: 80% 50% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #pg-result .pg-bg-plate,
+  #pg-result .pg-bg-bottle,
+  #pg-result .pg-bg-image {
+    object-position: 85% 50% !important;
+  }
+}
+/* ===== END mobile bottle visibility fix ===== */
