@@ -1687,3 +1687,19 @@ textarea:focus { border-bottom-color: var(--red); }
   pointer-events: none;
 }
 /* ===== END fade parallax bottle in can section ===== */
+
+/* ===== AUTO-INJECTED: can mobile centering fix ===== */
+@media (max-width: 600px) {
+  #pg-result .r-can-stage {
+    width: 78vw;
+    max-width: 78vw;
+  }
+  #pg-result .r-can-floater {
+    animation-name: rCanFloatMobile;
+  }
+}
+@keyframes rCanFloatMobile {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+/* ===== END can mobile centering fix ===== */
