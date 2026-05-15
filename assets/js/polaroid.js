@@ -1,19 +1,17 @@
 /* ============================================================
-   Moments Atlas — Polaroid v3
-   - Robust: visibility driven by .r-polaroid state class (CSS-only)
-   - Better Flux prompt format + negative prompt
-   - Download as PNG (canvas)
-   - Send bottle modal (Resend email)
-   - Atlas note
+   Moments Atlas — Polaroid v4
+   - Event delegation on document (no race condition possible)
+   - Retry Pollinations up to 3 times with new seed
+   - Visibility via state class
+   - Download + Send bottle + Atlas note
    ============================================================ */
 (function () {
   'use strict';
 
-  if (window.__polaroidV3Loaded) return;
-  window.__polaroidV3Loaded = true;
-
   var POLLINATIONS_BASE = 'https://image.pollinations.ai/prompt/';
   var NEGATIVE = 'cafe terrace, restaurant interior, bar, modern, stock photo, generic, watermark, text, logo overlay, distorted faces, hands deformed';
+  var MAX_RETRIES = 3;
+  var IMAGE_TIMEOUT_MS = 22000;
 
   var currentState = {
     memory: '',
@@ -21,10 +19,10 @@
     city: '',
     year: '',
     polaroidImageUrl: null,
+    currentPrompt: '',
   };
 
-  function buildPollinationsUrl(prompt) {
-    var seed = Math.floor(Math.random() * 1000000);
+  function buildPollinationsUrl(prompt, seed) {
     return POLLINATIONS_BASE +
       encodeURIComponent(prompt) +
       '?width=768&height=960' +
@@ -59,6 +57,57 @@
     setStatus(msg || 'Could not develop this memory.');
   }
 
+  function tryLoadImage(url) {
+    return new Promise(function (resolve, reject) {
+      var probe = new Image();
+      probe.crossOrigin = 'anonymous';
+      var settled = false;
+      var timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        reject(new Error('timeout'));
+      }, IMAGE_TIMEOUT_MS);
+      probe.onload = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (probe.naturalWidth < 50) {
+          reject(new Error('empty_image'));
+        } else {
+          resolve(url);
+        }
+      };
+      probe.onerror = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        reject(new Error('load_error'));
+      };
+      probe.src = url;
+    });
+  }
+
+  async function loadWithRetry(prompt) {
+    var lastErr = null;
+    for (var attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      var seed = Math.floor(Math.random() * 1000000);
+      var url = buildPollinationsUrl(prompt, seed);
+      if (attempt > 0) {
+        setStatus('The film is taking shape… (try ' + (attempt + 1) + '/' + MAX_RETRIES + ')');
+      }
+      try {
+        var ok = await tryLoadImage(url);
+        return ok;
+      } catch (err) {
+        lastErr = err;
+        if (attempt < MAX_RETRIES - 1) {
+          await new Promise(function (r) { setTimeout(r, 800 + attempt * 600); });
+        }
+      }
+    }
+    throw lastErr || new Error('all_attempts_failed');
+  }
+
   async function generatePolaroid(memory, name, city, year) {
     currentState = {
       memory: memory || '',
@@ -66,6 +115,7 @@
       city: city || '',
       year: year || '',
       polaroidImageUrl: null,
+      currentPrompt: '',
     };
 
     var polaroid = $('r-polaroid');
@@ -103,39 +153,21 @@
         return;
       }
 
-      var url = buildPollinationsUrl(data.prompt);
-      currentState.polaroidImageUrl = url;
-
-      var probe = new Image();
-      probe.crossOrigin = 'anonymous';
-      var settled = false;
-      var safety = setTimeout(function () {
-        if (settled) return;
-        settled = true;
-        if (img) {
-          img.crossOrigin = 'anonymous';
-          img.src = url;
-          setState('ready');
-        }
-      }, 25000);
-
-      probe.onload = function () {
-        if (settled) return;
-        settled = true;
-        clearTimeout(safety);
-        if (img) {
-          img.crossOrigin = 'anonymous';
-          img.src = url;
-          setState('ready');
-        }
-      };
-      probe.onerror = function () {
-        if (settled) return;
-        settled = true;
-        clearTimeout(safety);
+      currentState.currentPrompt = data.prompt;
+      var finalUrl;
+      try {
+        finalUrl = await loadWithRetry(data.prompt);
+      } catch (err) {
         showError('The film never developed.');
-      };
-      probe.src = url;
+        return;
+      }
+
+      currentState.polaroidImageUrl = finalUrl;
+      if (img) {
+        img.crossOrigin = 'anonymous';
+        img.src = finalUrl;
+        setState('ready');
+      }
     } catch (err) {
       showError('Network error.');
     }
@@ -265,11 +297,7 @@
     document.body.style.overflow = '';
   }
 
-  async function submitSendForm(e) {
-    e.preventDefault();
-    var form = $('r-send-form');
-    if (!form) return;
-
+  async function submitSendForm(form) {
     var fd = new FormData(form);
     var payload = {
       recipientEmail: String(fd.get('recipientEmail') || '').trim(),
@@ -321,29 +349,49 @@
     }
   }
 
-  function bindActions() {
-    var dl = $('r-action-download');
-    var sd = $('r-action-send');
-    var close = $('r-send-close');
-    var form = $('r-send-form');
-    var modal = $('r-send-modal');
+  /* ====== Event delegation on document — bulletproof ====== */
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
 
-    if (dl) dl.addEventListener('click', downloadPolaroid);
-    if (sd) sd.addEventListener('click', openSendModal);
-    if (close) close.addEventListener('click', closeSendModal);
-    if (form) form.addEventListener('submit', submitSendForm);
-    if (modal) {
-      modal.addEventListener('click', function (e) {
-        if (e.target === modal) closeSendModal();
-      });
+    if (t.closest('#r-action-download')) {
+      e.preventDefault();
+      downloadPolaroid();
+      return;
     }
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && modal && modal.classList.contains('open')) closeSendModal();
-    });
-  }
 
-  if (document.readyState !== 'loading') bindActions();
-  else document.addEventListener('DOMContentLoaded', bindActions);
+    if (t.closest('#r-action-send')) {
+      e.preventDefault();
+      openSendModal();
+      return;
+    }
+
+    if (t.closest('#r-send-close') || t.closest('#r-send-close-success')) {
+      e.preventDefault();
+      closeSendModal();
+      return;
+    }
+
+    if (t.id === 'r-send-modal') {
+      closeSendModal();
+      return;
+    }
+  });
+
+  document.addEventListener('submit', function (e) {
+    if (e.target && e.target.id === 'r-send-form') {
+      e.preventDefault();
+      submitSendForm(e.target);
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      var modal = $('r-send-modal');
+      if (modal && modal.classList.contains('open')) closeSendModal();
+    }
+  });
 
   window.__generatePolaroid = generatePolaroid;
+  window.__polaroidV4Loaded = true;
 })();
