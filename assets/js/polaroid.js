@@ -1,5 +1,6 @@
 /* ============================================================
-   Moments Atlas — Polaroid v2
+   Moments Atlas — Polaroid v3
+   - Robust: visibility driven by .r-polaroid state class (CSS-only)
    - Better Flux prompt format + negative prompt
    - Download as PNG (canvas)
    - Send bottle modal (Resend email)
@@ -8,8 +9,8 @@
 (function () {
   'use strict';
 
-  if (window.__polaroidV2Loaded) return;
-  window.__polaroidV2Loaded = true;
+  if (window.__polaroidV3Loaded) return;
+  window.__polaroidV3Loaded = true;
 
   var POLLINATIONS_BASE = 'https://image.pollinations.ai/prompt/';
   var NEGATIVE = 'cafe terrace, restaurant interior, bar, modern, stock photo, generic, watermark, text, logo overlay, distorted faces, hands deformed';
@@ -24,7 +25,7 @@
 
   function buildPollinationsUrl(prompt) {
     var seed = Math.floor(Math.random() * 1000000);
-    var url = POLLINATIONS_BASE +
+    return POLLINATIONS_BASE +
       encodeURIComponent(prompt) +
       '?width=768&height=960' +
       '&nologo=true' +
@@ -32,7 +33,6 @@
       '&model=flux' +
       '&seed=' + seed +
       '&negative=' + encodeURIComponent(NEGATIVE);
-    return url;
   }
 
   function $(id) { return document.getElementById(id); }
@@ -42,23 +42,21 @@
     if (st) st.textContent = text;
   }
 
-  function showError(msg) {
+  function setState(state) {
     var p = $('r-polaroid');
     if (!p) return;
-    p.classList.remove('loading');
-    p.classList.add('errored');
+    p.classList.remove('loading', 'ready', 'errored');
+    p.classList.add(state);
+    var wrap = p.closest('.r-polaroid-wrap');
+    if (wrap) {
+      wrap.classList.remove('is-loading', 'is-ready', 'is-errored');
+      wrap.classList.add('is-' + state);
+    }
+  }
+
+  function showError(msg) {
+    setState('errored');
     setStatus(msg || 'Could not develop this memory.');
-    hideActions();
-  }
-
-  function hideActions() {
-    var bar = document.querySelector('.r-polaroid-actions');
-    if (bar) bar.style.display = 'none';
-  }
-
-  function showActions() {
-    var bar = document.querySelector('.r-polaroid-actions');
-    if (bar) bar.style.display = '';
   }
 
   async function generatePolaroid(memory, name, city, year) {
@@ -73,9 +71,7 @@
     var polaroid = $('r-polaroid');
     if (!polaroid) return;
 
-    polaroid.classList.remove('ready', 'errored');
-    polaroid.classList.add('loading');
-    hideActions();
+    setState('loading');
 
     var img = polaroid.querySelector('.r-polaroid-img');
     var cap = polaroid.querySelector('.r-polaroid-caption');
@@ -112,16 +108,31 @@
 
       var probe = new Image();
       probe.crossOrigin = 'anonymous';
-      probe.onload = function () {
+      var settled = false;
+      var safety = setTimeout(function () {
+        if (settled) return;
+        settled = true;
         if (img) {
           img.crossOrigin = 'anonymous';
           img.src = url;
-          polaroid.classList.remove('loading');
-          polaroid.classList.add('ready');
-          showActions();
+          setState('ready');
+        }
+      }, 25000);
+
+      probe.onload = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(safety);
+        if (img) {
+          img.crossOrigin = 'anonymous';
+          img.src = url;
+          setState('ready');
         }
       };
       probe.onerror = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(safety);
         showError('The film never developed.');
       };
       probe.src = url;
@@ -168,7 +179,6 @@
 
       ctx.fillStyle = '#fffcf3';
       ctx.fillRect(0, 0, W, H);
-
       ctx.drawImage(src, FRAME, FRAME, photoW, photoH);
 
       var attribution = [currentState.name, currentState.city, currentState.year]
@@ -226,7 +236,6 @@
   function openSendModal() {
     var modal = $('r-send-modal');
     if (!modal) return;
-
     var memEl = modal.querySelector('.r-send-memory');
     var atrEl = modal.querySelector('.r-send-attr');
     if (memEl) memEl.textContent = '"' + currentState.memory + '"';

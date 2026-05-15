@@ -1394,3 +1394,54 @@ textarea:focus { border-bottom-color: var(--red); }
     font-size: 19px;
   }
 }
+/* ============================================================
+   AUTO-INJECTED v3: polaroid actions visibility hotfix
+   Actions/note visibles UNIQUEMENT quand .r-polaroid.ready
+   ============================================================ */
+
+#pg-result .r-polaroid-actions {
+  margin-top: 36px;
+  display: flex !important;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 700ms ease 200ms, transform 700ms ease 200ms;
+}
+
+#pg-result .r-polaroid.ready ~ .r-polaroid-actions,
+#pg-result .r-polaroid-wrap:has(.r-polaroid.ready) .r-polaroid-actions {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+#pg-result .r-polaroid-atlas-note {
+  text-align: center;
+  font-size: 11px;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  color: rgba(255, 245, 230, 0.5);
+  margin: 24px auto 0;
+  max-width: 360px;
+  line-height: 1.6;
+  opacity: 0;
+  transition: opacity 900ms ease 600ms;
+}
+
+#pg-result .r-polaroid.ready ~ .r-polaroid-atlas-note,
+#pg-result .r-polaroid-wrap:has(.r-polaroid.ready) .r-polaroid-atlas-note {
+  opacity: 1;
+}
+
+/* fallback for browsers without :has() support — class added by JS */
+#pg-result .r-polaroid-wrap.is-ready .r-polaroid-actions {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+#pg-result .r-polaroid-wrap.is-ready .r-polaroid-atlas-note {
+  opacity: 1;
+}
