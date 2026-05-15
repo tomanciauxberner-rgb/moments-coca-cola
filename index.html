@@ -139,10 +139,63 @@
           <span class="r-polaroid-caption"></span>
         </div>
       </div>
+      <div class="r-polaroid-actions" style="display:none;">
+        <button class="r-action-btn" id="r-action-download" type="button">
+          <span class="r-action-icon" aria-hidden="true">↓</span>
+          <span>Save as polaroid</span>
+        </button>
+        <button class="r-action-btn primary" id="r-action-send" type="button">
+          <span class="r-action-icon" aria-hidden="true">✉</span>
+          <span>Send this bottle</span>
+        </button>
+      </div>
+      <div class="r-polaroid-atlas-note">
+        Your bottle now lives in the Atlas. Somewhere, someone may find an echo of yours.
+      </div>
     </div>
   </div>
 </section>
-    <section class="r-section r-section-twin">
+
+<!-- Send bottle modal -->
+<div class="r-send-modal" id="r-send-modal" role="dialog" aria-modal="true" aria-labelledby="r-send-title">
+  <div class="r-send-dialog">
+    <button class="r-send-close" id="r-send-close" aria-label="Close" type="button">×</button>
+    <div class="r-send-eyebrow">Send this bottle</div>
+    <h3 class="r-send-title" id="r-send-title">A custom Coca-Cola bottle, for someone you remember.</h3>
+    <div class="r-send-preview">
+      <blockquote class="r-send-memory"></blockquote>
+      <div class="r-send-attr"></div>
+    </div>
+    <form class="r-send-form" id="r-send-form">
+      <label class="r-send-label">
+        <span>Their email</span>
+        <input type="email" name="recipientEmail" required placeholder="friend@example.com" autocomplete="email">
+      </label>
+      <label class="r-send-label">
+        <span>Their name <em>(optional)</em></span>
+        <input type="text" name="recipientName" placeholder="Sarah" maxlength="60">
+      </label>
+      <label class="r-send-label">
+        <span>Your name <em>(optional)</em></span>
+        <input type="text" name="senderName" placeholder="Tom" maxlength="60">
+      </label>
+      <label class="r-send-label">
+        <span>A short message <em>(optional)</em></span>
+        <textarea name="personalMessage" rows="3" maxlength="400" placeholder="I thought of you when I wrote this."></textarea>
+      </label>
+      <div class="r-send-error" role="alert"></div>
+      <button class="r-action-btn primary r-send-submit" type="submit">Send this bottle</button>
+      <p class="r-send-fineprint">A demo email will be delivered immediately. Editorial demo. Not affiliated with The Coca-Cola Company.</p>
+    </form>
+    <div class="r-send-success" id="r-send-success" style="display:none;">
+      <div class="r-send-success-mark">✓</div>
+      <h3 class="r-send-success-title">Your bottle is on its way.</h3>
+      <p class="r-send-success-text">Sent to <span class="r-send-recipient"></span>.</p>
+      <p class="r-send-success-sub">In a future production version, this email would unlock a real custom Coca-Cola bottle, delivered.</p>
+      <button class="r-action-btn" id="r-send-close-success" onclick="document.getElementById('r-send-close').click()" type="button">Close</button>
+    </div>
+  </div>
+</div><section class="r-section r-section-twin">
       <div class="r-eyebrow">We found you a twin moment</div>
       <h2 class="r-twin-headline" id="r-twin-headline"></h2>
       <p class="r-subtitle">Somewhere, sometime, someone else lived a moment that echoes yours.</p>
