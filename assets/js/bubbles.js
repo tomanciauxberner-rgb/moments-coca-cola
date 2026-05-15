@@ -1,55 +1,77 @@
 /* ============================================================
-   Moments Atlas — Bottle bubbles
-   - Canvas particles rising from the bottle neck
+   Moments Atlas — Bottle bubbles v2
+   - Canvas positioned ABSOLUTE inside #pg-result (no fixed)
+   - Anchored directly above the parallax bottle
    - Subtle, slow, premium
-   - GPU-friendly, RAF-driven
-   - Respects prefers-reduced-motion, pauses when tab hidden
    ============================================================ */
 (function () {
   'use strict';
 
-  if (window.__bubblesLoaded) return;
-  window.__bubblesLoaded = true;
+  if (window.__bubblesV2Loaded) return;
+  window.__bubblesV2Loaded = true;
 
-  var MAX_BUBBLES = 14;
-  var SPAWN_INTERVAL = 600;
-  var SPAWN_JITTER = 500;
-  var BUBBLE_LIFETIME = 8000;
+  var MAX_BUBBLES = 16;
+  var SPAWN_INTERVAL = 550;
+  var SPAWN_JITTER = 450;
+  var BUBBLE_LIFETIME = 7500;
+
+  /* Where the bottle neck sits, in viewport ratios.
+     Tuned from the screenshot: neck around 78% from left, 60% from top. */
+  var NECK_X_RATIO = 0.78;
+  var NECK_Y_RATIO = 0.60;
 
   function init() {
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion) return;
 
     var pgResult = document.getElementById('pg-result');
-    var bottle = document.getElementById('pgBgBottle');
-    if (!pgResult || !bottle) return;
+    if (!pgResult) return;
+
+    /* Remove any previous canvas from v1 */
+    var oldCanvas = document.getElementById('pgBgBubbles');
+    if (oldCanvas) oldCanvas.remove();
 
     var canvas = document.createElement('canvas');
-    canvas.id = 'pgBgBubbles';
-    canvas.style.position = 'fixed';
-    canvas.style.inset = '0';
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.pointerEvents = 'none';
-    canvas.style.zIndex = '1';
-    canvas.style.opacity = '0';
-    canvas.style.transition = 'opacity 1200ms ease 800ms';
+    canvas.id = 'pgBgBubblesV2';
+    canvas.style.cssText = [
+      'position:absolute',
+      'top:0',
+      'left:0',
+      'width:100%',
+      'height:100%',
+      'pointer-events:none',
+      'z-index:2',
+      'mix-blend-mode:screen',
+    ].join(';');
 
-    var firstChild = pgResult.firstChild;
-    pgResult.insertBefore(canvas, firstChild);
+    /* Ensure pg-result is positioned for absolute children */
+    var pos = getComputedStyle(pgResult).position;
+    if (pos === 'static') {
+      pgResult.style.position = 'relative';
+    }
+
+    /* Insert before any other content (will be behind text/polaroid via z-index) */
+    pgResult.appendChild(canvas);
 
     var ctx = canvas.getContext('2d');
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     function resize() {
-      var w = window.innerWidth;
-      var h = window.innerHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      var rect = pgResult.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     resize();
-    window.addEventListener('resize', resize, { passive: true });
+
+    var resizeRaf = null;
+    window.addEventListener('resize', function () {
+      if (resizeRaf) return;
+      resizeRaf = requestAnimationFrame(function () {
+        resize();
+        resizeRaf = null;
+      });
+    }, { passive: true });
 
     var bubbles = [];
     var lastSpawn = 0;
@@ -57,28 +79,28 @@
     var paused = false;
 
     function getNeckOrigin() {
-      var rect = bottle.getBoundingClientRect();
-      // Bottle neck is roughly at top 8% and center-x of the bottle image
-      var x = rect.left + rect.width * 0.52;
-      var y = rect.top + rect.height * 0.05;
-      return { x: x, y: y, width: rect.width };
+      var rect = pgResult.getBoundingClientRect();
+      return {
+        x: rect.width * NECK_X_RATIO,
+        y: rect.height * NECK_Y_RATIO,
+        width: rect.width,
+      };
     }
 
     function spawn() {
       if (bubbles.length >= MAX_BUBBLES) return;
       var origin = getNeckOrigin();
-      var spread = origin.width * 0.04;
+      var spread = origin.width * 0.025;
       bubbles.push({
-        x: origin.x + (Math.random() - 0.5) * spread * 2,
-        y: origin.y + Math.random() * 10,
         baseX: origin.x + (Math.random() - 0.5) * spread * 2,
-        vy: -(0.25 + Math.random() * 0.5),
+        y: origin.y + Math.random() * 8,
+        vy: -(0.3 + Math.random() * 0.6),
         r: 2 + Math.random() * 5,
         rGrowth: 0.0015 + Math.random() * 0.0025,
         phase: Math.random() * Math.PI * 2,
         freq: 0.6 + Math.random() * 0.8,
-        amp: 8 + Math.random() * 18,
-        opacity: 0.25 + Math.random() * 0.35,
+        amp: 10 + Math.random() * 18,
+        opacity: 0.35 + Math.random() * 0.4,
         born: performance.now(),
         wobble: 0,
       });
@@ -92,7 +114,9 @@
         lastSpawn = now;
       }
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      var cssW = canvas.width / dpr;
+      var cssH = canvas.height / dpr;
+      ctx.clearRect(0, 0, cssW, cssH);
 
       for (var i = bubbles.length - 1; i >= 0; i--) {
         var b = bubbles[i];
@@ -105,17 +129,17 @@
         b.y += b.vy;
         b.vy -= 0.0008;
         b.r += b.rGrowth;
-        b.wobble += 0.016 * b.freq;
+        b.wobble += 0.018 * b.freq;
 
         var xOffset = Math.sin(b.wobble + b.phase) * b.amp * 0.4;
         var drawX = b.baseX + xOffset;
         var drawY = b.y;
 
-        var fadeIn = Math.min(1, age / 600);
+        var fadeIn = Math.min(1, age / 500);
         var fadeOut = age > BUBBLE_LIFETIME * 0.7
           ? Math.max(0, 1 - (age - BUBBLE_LIFETIME * 0.7) / (BUBBLE_LIFETIME * 0.3))
           : 1;
-        var topFade = b.y < 80 ? Math.max(0, b.y / 80) : 1;
+        var topFade = b.y < 60 ? Math.max(0, b.y / 60) : 1;
         var alpha = b.opacity * fadeIn * fadeOut * topFade;
 
         if (alpha < 0.01) continue;
@@ -127,8 +151,8 @@
           drawX - b.r * 0.3, drawY - b.r * 0.3, 0,
           drawX, drawY, b.r
         );
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
-        gradient.addColorStop(0.5, 'rgba(255, 245, 230, 0.35)');
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+        gradient.addColorStop(0.5, 'rgba(255, 245, 230, 0.5)');
         gradient.addColorStop(1, 'rgba(255, 220, 200, 0)');
 
         ctx.fillStyle = gradient;
@@ -136,13 +160,13 @@
         ctx.arc(drawX, drawY, b.r, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.lineWidth = 0.6;
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
-        ctx.arc(drawX - b.r * 0.35, drawY - b.r * 0.35, b.r * 0.22, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.arc(drawX - b.r * 0.35, drawY - b.r * 0.35, b.r * 0.25, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.restore();
@@ -170,24 +194,7 @@
       else start();
     });
 
-    function onResultActive() {
-      var pg = document.getElementById('pg-result');
-      if (pg && pg.classList.contains('active')) {
-        canvas.style.opacity = '1';
-        if (!rafId) start();
-      } else {
-        canvas.style.opacity = '0';
-        // keep running anyway, cheap
-      }
-    }
-
-    var mo = new MutationObserver(onResultActive);
-    mo.observe(pgResult, { attributes: true, attributeFilter: ['class'] });
-    onResultActive();
-
-    setTimeout(function () {
-      if (!rafId && !paused) start();
-    }, 1500);
+    start();
   }
 
   if (document.readyState !== 'loading') init();
