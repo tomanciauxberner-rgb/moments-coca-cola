@@ -907,3 +907,26 @@ textarea:focus { border-bottom-color: var(--red); }
   height: auto;
   filter: brightness(0) invert(1) drop-shadow(0 4px 16px rgba(0,0,0,0.4));
 }
+
+/* ===== AUTO-INJECTED: parallax 2-layer (bottle + bg plate) ===== */
+#pg-result .pg-bg-plate,
+#pg-result .pg-bg-bottle {
+  position: fixed !important;
+  top: 0; left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+#pg-result .pg-bg-plate { z-index: 0 !important; }
+#pg-result .pg-bg-bottle { z-index: 1 !important; }
+#pg-result.video-ended .pg-bg-plate,
+#pg-result.video-ended .pg-bg-bottle {
+  opacity: 1;
+}
+#pg-result.video-ended .pg-bg-image {
+  opacity: 0 !important;
+}
+/* ===== END parallax 2-layer ===== */
