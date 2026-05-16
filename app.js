@@ -299,3 +299,171 @@ window.__revealCascade = function(){
     return ret;
   };
 })();
+/* ============================================================
+   AUTO-INJECTED: Tone-aware matching
+   - Adds joyful entries to DB
+   - Adds tone detection from user input
+   - Overrides showResult selection to match tone
+   ============================================================ */
+(function () {
+  'use strict';
+
+  if (typeof DB === 'undefined' || !DB) return;
+  if (window.__toneAwareLoaded) return;
+  window.__toneAwareLoaded = true;
+
+  // ---- Tag existing entries (legacy ones) as melancholy ----
+  Object.keys(DB).forEach(function (k) {
+    if (!DB[k].tone) DB[k].tone = 'melancholy';
+  });
+
+  // ---- Add joyful entries ----
+  var JOY = {
+    "she said yes": {
+      yearCity: "Marco \u00b7 Naples \u00b7 2019",
+      headline: "The night the world tilted in your favor.",
+      quote: "We laughed all the way home, two warm Cokes on the kitchen counter, the ring still on her finger like it had always been there.",
+      meta: "Marco \u00b7 Naples \u00b7 2019",
+      tone: "joy",
+      connections: [
+        { text: "She said yes between two sips. We forgot to drink the rest.", place: "Inez \u00b7 Lisbon \u00b7 2017" },
+        { text: "Toast at midnight. Two bottles, one promise.", place: "Rohan \u00b7 Mumbai \u00b7 2021" },
+        { text: "Her laugh echoed off the kitchen tiles. I'll never forget that sound.", place: "Yusuf \u00b7 Istanbul \u00b7 2015" }
+      ]
+    },
+    "first steps": {
+      yearCity: "Sara \u00b7 Stockholm \u00b7 2014",
+      headline: "The day you stood up and the room exploded.",
+      quote: "We cheered like idiots. The Coke went flat in the fridge. Nobody touched it. Some moments don't need a drink.",
+      meta: "Sara \u00b7 Stockholm \u00b7 2014",
+      tone: "joy",
+      connections: [
+        { text: "She walked. We screamed. The neighbors thought we'd won the lottery.", place: "Olivia \u00b7 Dublin \u00b7 2018" },
+        { text: "He fell three times. The fourth time, he ran.", place: "Mateo \u00b7 Buenos Aires \u00b7 2020" },
+        { text: "Pure, loud, ridiculous joy.", place: "Anh \u00b7 Hanoi \u00b7 2016" }
+      ]
+    },
+    "reunion": {
+      yearCity: "Diego \u00b7 Mexico City \u00b7 2022",
+      headline: "Seven years became two seconds in the arrivals hall.",
+      quote: "He held me so tight I dropped my Coke on the floor. Neither of us cared. Some hugs are worth a stained shirt.",
+      meta: "Diego \u00b7 Mexico City \u00b7 2022",
+      tone: "joy",
+      connections: [
+        { text: "Mom came through customs. I was twelve again.", place: "Anya \u00b7 Kyiv \u00b7 2019" },
+        { text: "The airport screen said LANDED. I started to cry.", place: "Tariq \u00b7 Casablanca \u00b7 2017" },
+        { text: "We sat on the floor of arrivals and laughed for an hour.", place: "Sven \u00b7 Berlin \u00b7 2023" }
+      ]
+    },
+    "pool party": {
+      yearCity: "Luc\u00eda \u00b7 Madrid \u00b7 2018",
+      headline: "The summer night that refused to end.",
+      quote: "Pool, ice, salsa music. Cokes in plastic cups. No one wanted the sunrise to come. So we kept dancing until it did anyway.",
+      meta: "Luc\u00eda \u00b7 Madrid \u00b7 2018",
+      tone: "joy",
+      connections: [
+        { text: "Wet feet, warm bottles, perfect company.", place: "Felipe \u00b7 S\u00e3o Paulo \u00b7 2016" },
+        { text: "The speakers blew at 4am. We sang the rest.", place: "Naila \u00b7 Beirut \u00b7 2019" },
+        { text: "Everyone danced badly. It was the best night of the year.", place: "Adaeze \u00b7 Lagos \u00b7 2021" }
+      ]
+    },
+    "finish line": {
+      yearCity: "Kenji \u00b7 Tokyo \u00b7 2016",
+      headline: "Eighteen kilometers, and the only thing that mattered was their faces.",
+      quote: "Crossed the line. They were all there, holding a Coke up like a trophy. I cried into it. The medal was nothing compared to that.",
+      meta: "Kenji \u00b7 Tokyo \u00b7 2016",
+      tone: "joy",
+      connections: [
+        { text: "My legs stopped working. My heart didn't.", place: "Mara \u00b7 Cape Town \u00b7 2018" },
+        { text: "Dad was waiting at the finish. He cried first.", place: "Theo \u00b7 Athens \u00b7 2020" },
+        { text: "Sweat, ice, victory. All in one bottle.", place: "Priya \u00b7 Bangalore \u00b7 2022" }
+      ]
+    }
+  };
+
+  Object.keys(JOY).forEach(function (k) {
+    DB[k] = JOY[k];
+  });
+
+  // ---- Tone detection ----
+  var JOY_TOKENS = [
+    'yes', 'laugh', 'laughed', 'laughing', 'dance', 'dancing', 'danced',
+    'cheer', 'cheered', 'won', 'win', 'winning', 'victory', 'trophy', 'finish line',
+    'sunrise', 'party', 'birthday', 'wedding', 'engaged', 'married',
+    'reunion', 'reunited', 'hug', 'hugged', 'kiss', 'kissed',
+    'newborn', 'first step', 'first steps', 'first time',
+    'happiness', 'happy', 'joy', 'joyful', 'amazing', 'magical', 'magic',
+    'celebration', 'celebrate', 'celebrated', 'sang', 'singing',
+    'sun', 'pool', 'beach', 'summer', 'holiday', 'vacation',
+    'pride', 'proud', 'love', 'loved', 'best night', 'best day',
+    'oui', 'rire', 'ri', 'danse', 'dans\u00e9', 'gagn\u00e9', 'victoire',
+    'mariage', 'mari\u00e9', 'b\u00e9b\u00e9', 'rencontre', 'bonheur', 'heureux',
+    'f\u00eate', 'soleil', 'plage', '\u00e9t\u00e9', 'amour', 'amoureux'
+  ];
+
+  var MELANCHOLY_TOKENS = [
+    'alone', 'left', 'leaving', 'gone', 'empty', 'silent', 'silence',
+    'goodbye', 'last', 'final', 'never', 'lost', 'died', 'death',
+    'cry', 'cried', 'crying', 'tears', 'sad', 'sadness',
+    'broke', 'broken', 'breakup', 'divorce', 'split',
+    'cold', 'dark', 'rain', 'night alone',
+    'seul', 'parti', 'parti', 'vide', 'silence', 'adieu',
+    'dernier', 'dernière', 'mort', 'pleur', 'triste',
+    'rompre', 'rompu', 'divorce', 'froid', 'pluie'
+  ];
+
+  function detectTone(input) {
+    var s = String(input || '').toLowerCase();
+    var joyHits = 0, melHits = 0;
+    JOY_TOKENS.forEach(function (t) {
+      if (s.indexOf(t) !== -1) joyHits++;
+    });
+    MELANCHOLY_TOKENS.forEach(function (t) {
+      if (s.indexOf(t) !== -1) melHits++;
+    });
+    if (joyHits > melHits) return 'joy';
+    if (melHits > joyHits) return 'melancholy';
+    return 'neutral';
+  }
+
+  // ---- Override showResult selection logic ----
+  if (typeof window.showResult !== 'function') return;
+  var _origShow = window.showResult;
+
+  // We wrap the original to inject tone-matched fallback
+  window.showResult = function (input, name, city, year) {
+    var tone = detectTone(input);
+
+    // If input doesn't match any DB key directly, pick a tone-matched random entry
+    var inputLower = String(input || '').toLowerCase();
+    var hasKeywordMatch = false;
+    for (var key in DB) {
+      if (inputLower.indexOf(key) !== -1) {
+        hasKeywordMatch = true;
+        break;
+      }
+      var keyWords = key.split(' ');
+      for (var i = 0; i < keyWords.length; i++) {
+        if (keyWords[i].length > 4 && inputLower.indexOf(keyWords[i]) !== -1) {
+          hasKeywordMatch = true;
+          break;
+        }
+      }
+      if (hasKeywordMatch) break;
+    }
+
+    if (!hasKeywordMatch && tone !== 'neutral') {
+      // pick a random entry that matches the detected tone
+      var pool = Object.keys(DB).filter(function (k) {
+        return DB[k].tone === tone;
+      });
+      if (pool.length > 0) {
+        var chosenKey = pool[Math.floor(Math.random() * pool.length)];
+        // inject the chosen key into the input so the original matcher picks it
+        return _origShow.call(this, chosenKey, name, city, year);
+      }
+    }
+
+    return _origShow.call(this, input, name, city, year);
+  };
+})();

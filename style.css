@@ -2127,3 +2127,324 @@ textarea:focus { border-bottom-color: var(--red); }
 #pg-input .field-group {
   margin-bottom: 20px;
 }
+/* ============================================================
+   AUTO-INJECTED: Page 4 (result) polish
+   - Fix eyebrow strike-through bug (::before/::after lines collide with text)
+   - Better contrast on muted eyebrows
+   - Connections cards : depth, hover lift, cascade entry
+   - Twin match card : inner shadow, depth
+   - CTA button styled to match page 1
+   - Polaroid eyebrow lisibilite
+   DOES NOT TOUCH: parallax bottle, polaroid, coca stamp, bubbles, can section
+   ============================================================ */
+
+/* ---------- Fix eyebrow strike-through (lines were going through text) ---------- */
+
+#pg-result .r-eyebrow {
+  position: relative;
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255, 245, 230, 0.78);
+  padding: 0 28px;
+  margin-bottom: 24px;
+  /* override any conflicting parent styles */
+  background: transparent;
+}
+
+/* Decorative side lines, properly positioned to NOT cross text */
+#pg-result .r-eyebrow::before,
+#pg-result .r-eyebrow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 245, 230, 0.35) 50%,
+    transparent 100%
+  );
+  transform: translateY(-50%);
+}
+
+#pg-result .r-eyebrow::before {
+  right: 100%;
+  left: auto;
+  margin-right: 4px;
+}
+
+#pg-result .r-eyebrow::after {
+  left: 100%;
+  right: auto;
+  margin-left: 4px;
+}
+
+/* Container for the eyebrow centered properly */
+#pg-result .r-section .r-eyebrow {
+  display: inline-block;
+}
+
+#pg-result .r-section-quote,
+#pg-result .r-section-twin,
+#pg-result .r-section-conn,
+#pg-result .r-section-polaroid {
+  text-align: center;
+}
+
+/* ---------- Polaroid eyebrow lisibilite ---------- */
+
+#pg-result .r-polaroid-eyebrow {
+  color: rgba(255, 245, 230, 0.78) !important;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+/* ---------- Connections cards : depth + hover + cascade ---------- */
+
+#pg-result .r-connections {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  max-width: 960px;
+  margin: 40px auto 0;
+  padding: 0 24px;
+}
+
+@media (max-width: 720px) {
+  #pg-result .r-connections {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+  }
+}
+
+#pg-result .r-conn-card {
+  position: relative;
+  text-align: left;
+  padding: 22px 22px 24px;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 245, 230, 0.04) 0%,
+    rgba(255, 245, 230, 0.015) 100%
+  );
+  border: 1px solid rgba(255, 245, 230, 0.1);
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition:
+    transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 380ms ease,
+    box-shadow 380ms ease,
+    background 380ms ease;
+  opacity: 0;
+  animation: rConnEnter 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes rConnEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#pg-result .r-conn-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 22px;
+  right: 22px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(238, 47, 42, 0.55) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 380ms ease;
+}
+
+#pg-result .r-conn-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(238, 47, 42, 0.4);
+  background: linear-gradient(
+    160deg,
+    rgba(238, 47, 42, 0.07) 0%,
+    rgba(238, 47, 42, 0.02) 100%
+  );
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(238, 47, 42, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+#pg-result .r-conn-card:hover::before {
+  opacity: 1;
+}
+
+#pg-result .r-conn-place {
+  font-size: 10px !important;
+  letter-spacing: 0.28em !important;
+  text-transform: uppercase;
+  color: rgba(255, 245, 230, 0.55) !important;
+  margin-bottom: 14px !important;
+}
+
+#pg-result .r-conn-text {
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  font-style: italic;
+  color: rgba(255, 245, 230, 0.94) !important;
+  margin: 0;
+}
+
+/* ---------- Twin match card : depth ---------- */
+
+#pg-result .r-match-card {
+  position: relative;
+  max-width: 720px;
+  margin: 32px auto 0;
+  padding: 32px 40px 28px;
+  background: linear-gradient(
+    160deg,
+    rgba(0, 0, 0, 0.22) 0%,
+    rgba(0, 0, 0, 0.08) 100%
+  );
+  border: 1px solid rgba(255, 245, 230, 0.1);
+  border-radius: 6px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+#pg-result .r-match-card::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  bottom: 16px;
+  left: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(238, 47, 42, 0.7) 50%,
+    transparent 100%
+  );
+}
+
+#pg-result .r-match-quote {
+  font-size: 19px !important;
+  line-height: 1.55 !important;
+  font-style: italic;
+  color: rgba(255, 245, 230, 0.95) !important;
+  margin: 0 0 18px;
+}
+
+#pg-result .r-match-attribution {
+  font-size: 11px !important;
+  letter-spacing: 0.3em !important;
+  text-transform: uppercase;
+  color: rgba(255, 245, 230, 0.55) !important;
+}
+
+/* ---------- CTA "Add another moment" button : match page 1/2 style ---------- */
+
+#pg-result .r-cta-btn {
+  position: relative;
+  border: 0;
+  border-radius: 999px;
+  padding: 16px 44px;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #ee2f2a 0%, #c91d18 100%);
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    0 12px 30px rgba(238, 47, 42, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 280ms ease,
+    filter 280ms ease;
+  margin-top: 16px;
+}
+
+#pg-result .r-cta-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.18) 45%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.18) 55%,
+    transparent 80%
+  );
+  transform: skewX(-18deg);
+  animation: rCtaShimmer 4.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  pointer-events: none;
+}
+
+#pg-result .r-cta-btn::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+
+#pg-result .r-cta-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow:
+    0 18px 42px rgba(238, 47, 42, 0.38),
+    0 3px 10px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(238, 47, 42, 0.12);
+}
+
+#pg-result .r-cta-btn:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 80ms;
+}
+
+@keyframes rCtaShimmer {
+  0%, 30% { left: -120%; }
+  70%, 100% { left: 120%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #pg-result .r-cta-btn::before { animation: none; opacity: 0; }
+  #pg-result .r-conn-card { animation: none; opacity: 1; }
+}
+
+/* ---------- r-signature breath ---------- */
+
+#pg-result .r-signature {
+  margin-top: 32px;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  opacity: 0.42;
+}
