@@ -1,41 +1,38 @@
 /* ============================================================
-   Moments Atlas — Bottle fizz
-   - Small dense bubbles at bottle neck + inside coca liquid
-   - Anchored relative to viewport (parallax bottle is bottom-right)
-   - Active only on pg-result
-   - Subtle, premium, RAF-driven
+   Moments Atlas — Bottle fizz v2
+   - Shifted right (NECK 0.82, LIQUID 0.84)
+   - Bigger, more visible bubbles
+   - Denser liquid spawn
+   - Normal blend mode (no screen) for stronger visibility
    ============================================================ */
 (function () {
   'use strict';
 
-  if (window.__bottleFizzLoaded) return;
-  window.__bottleFizzLoaded = true;
+  if (window.__bottleFizzV2Loaded) return;
+  window.__bottleFizzV2Loaded = true;
 
-  /* Tuned positions relative to viewport.
-     The parallax bottle visually fills bottom-right.
-     Neck exit at about x=78% y=60%
-     Liquid body center at about x=80% y=80%  */
-  var NECK_X = 0.78;
+  var NECK_X = 0.82;
   var NECK_Y = 0.60;
-  var LIQUID_X = 0.80;
+  var LIQUID_X = 0.84;
   var LIQUID_Y_TOP = 0.65;
   var LIQUID_Y_BOTTOM = 0.92;
 
-  var MAX_BUBBLES = 22;
-  var SPAWN_NECK_INTERVAL = 220;
-  var SPAWN_LIQUID_INTERVAL = 380;
-  var LIFETIME_NECK = 1600;
-  var LIFETIME_LIQUID = 2400;
+  var MAX_BUBBLES = 28;
+  var SPAWN_NECK_INTERVAL = 180;
+  var SPAWN_LIQUID_INTERVAL = 220;
+  var LIFETIME_NECK = 1800;
+  var LIFETIME_LIQUID = 2600;
 
   function init() {
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion) return;
 
-    var old = document.getElementById('pgBottleFizz');
-    if (old) old.remove();
+    // Remove previous fizz canvases
+    var oldV1 = document.getElementById('pgBottleFizz');
+    if (oldV1) oldV1.remove();
 
     var canvas = document.createElement('canvas');
-    canvas.id = 'pgBottleFizz';
+    canvas.id = 'pgBottleFizzV2';
     canvas.style.cssText = [
       'position:fixed',
       'top:0',
@@ -43,8 +40,7 @@
       'width:100vw',
       'height:100vh',
       'pointer-events:none',
-      'z-index:2',
-      'mix-blend-mode:screen',
+      'z-index:3',
     ].join(';');
     document.body.appendChild(canvas);
 
@@ -81,20 +77,20 @@
     function spawnNeck() {
       if (bubbles.length >= MAX_BUBBLES) return;
       var w = window.innerWidth, h = window.innerHeight;
-      var spread = w * 0.012;
+      var spread = w * 0.014;
       bubbles.push({
         kind: 'neck',
         baseX: w * NECK_X + (Math.random() - 0.5) * spread * 2,
-        y: h * NECK_Y + (Math.random() - 0.5) * 6,
-        vy: -(0.5 + Math.random() * 0.8),
-        r: 0.8 + Math.random() * 1.6,
-        rGrowth: 0.0008 + Math.random() * 0.0015,
+        y: h * NECK_Y + (Math.random() - 0.5) * 8,
+        vy: -(0.6 + Math.random() * 0.9),
+        r: 1.6 + Math.random() * 2.4,
+        rGrowth: 0.0012 + Math.random() * 0.0018,
         phase: Math.random() * Math.PI * 2,
-        freq: 1.2 + Math.random() * 0.8,
-        amp: 4 + Math.random() * 8,
-        opacity: 0.4 + Math.random() * 0.4,
+        freq: 1.0 + Math.random() * 0.8,
+        amp: 5 + Math.random() * 10,
+        opacity: 0.6 + Math.random() * 0.35,
         born: performance.now(),
-        lifetime: LIFETIME_NECK + Math.random() * 400,
+        lifetime: LIFETIME_NECK + Math.random() * 500,
         wobble: 0,
       });
     }
@@ -102,21 +98,21 @@
     function spawnLiquid() {
       if (bubbles.length >= MAX_BUBBLES) return;
       var w = window.innerWidth, h = window.innerHeight;
-      var spread = w * 0.018;
+      var spread = w * 0.022;
       var startY = h * (LIQUID_Y_TOP + Math.random() * (LIQUID_Y_BOTTOM - LIQUID_Y_TOP));
       bubbles.push({
         kind: 'liquid',
         baseX: w * LIQUID_X + (Math.random() - 0.5) * spread * 2,
         y: startY,
-        vy: -(0.25 + Math.random() * 0.35),
-        r: 0.6 + Math.random() * 1.2,
-        rGrowth: 0.0006 + Math.random() * 0.001,
+        vy: -(0.3 + Math.random() * 0.45),
+        r: 1.2 + Math.random() * 2.0,
+        rGrowth: 0.001 + Math.random() * 0.0014,
         phase: Math.random() * Math.PI * 2,
-        freq: 0.8 + Math.random() * 0.6,
-        amp: 3 + Math.random() * 5,
-        opacity: 0.22 + Math.random() * 0.25,
+        freq: 0.7 + Math.random() * 0.7,
+        amp: 4 + Math.random() * 7,
+        opacity: 0.45 + Math.random() * 0.3,
         born: performance.now(),
-        lifetime: LIFETIME_LIQUID + Math.random() * 500,
+        lifetime: LIFETIME_LIQUID + Math.random() * 600,
         wobble: 0,
         ceiling: h * LIQUID_Y_TOP,
       });
@@ -160,18 +156,17 @@
         b.r += b.rGrowth;
         b.wobble += 0.022 * b.freq;
 
-        // liquid bubbles stop at their ceiling and burst
         if (b.kind === 'liquid' && b.y < b.ceiling) {
-          b.lifetime = Math.min(b.lifetime, age + 200);
+          b.lifetime = Math.min(b.lifetime, age + 250);
         }
 
         var xOffset = Math.sin(b.wobble + b.phase) * b.amp * 0.5;
         var drawX = b.baseX + xOffset;
         var drawY = b.y;
 
-        var fadeIn = Math.min(1, age / 300);
-        var fadeOut = age > b.lifetime * 0.7
-          ? Math.max(0, 1 - (age - b.lifetime * 0.7) / (b.lifetime * 0.3))
+        var fadeIn = Math.min(1, age / 350);
+        var fadeOut = age > b.lifetime * 0.75
+          ? Math.max(0, 1 - (age - b.lifetime * 0.75) / (b.lifetime * 0.25))
           : 1;
         var alpha = b.opacity * fadeIn * fadeOut;
 
@@ -181,24 +176,31 @@
         ctx.globalAlpha = alpha;
 
         var gradient = ctx.createRadialGradient(
-          drawX - b.r * 0.3, drawY - b.r * 0.3, 0,
+          drawX - b.r * 0.35, drawY - b.r * 0.35, 0,
           drawX, drawY, b.r
         );
         gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-        gradient.addColorStop(0.55, 'rgba(255, 240, 220, 0.4)');
-        gradient.addColorStop(1, 'rgba(255, 220, 180, 0)');
+        gradient.addColorStop(0.45, 'rgba(255, 248, 235, 0.75)');
+        gradient.addColorStop(0.85, 'rgba(255, 220, 180, 0.18)');
+        gradient.addColorStop(1, 'rgba(255, 200, 160, 0)');
 
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(drawX, drawY, b.r, 0, Math.PI * 2);
         ctx.fill();
 
-        if (b.r > 1.3) {
-          ctx.beginPath();
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-          ctx.arc(drawX - b.r * 0.35, drawY - b.r * 0.35, b.r * 0.25, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        // bright highlight
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.arc(drawX - b.r * 0.4, drawY - b.r * 0.4, b.r * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // thin outer ring for visibility
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.arc(drawX, drawY, b.r, 0, Math.PI * 2);
+        ctx.stroke();
 
         ctx.restore();
       }
