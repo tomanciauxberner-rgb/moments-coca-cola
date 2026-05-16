@@ -2448,3 +2448,329 @@ textarea:focus { border-bottom-color: var(--red); }
   letter-spacing: 0.05em;
   opacity: 0.42;
 }
+/* ============================================================
+   AUTO-INJECTED: Modal "Send this bottle" polish v2
+   - Premium paper-like dialog
+   - Underline-style inputs (no boxes)
+   - Shimmer submit button
+   - Animated focus
+   - Better hierarchy
+   ============================================================ */
+
+.r-send-modal {
+  background: rgba(15, 6, 4, 0.78) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+.r-send-dialog {
+  background: linear-gradient(170deg, #fffcf3 0%, #fdf5e6 100%) !important;
+  border: 1px solid rgba(212, 175, 130, 0.35) !important;
+  border-radius: 8px !important;
+  padding: 48px 44px 36px !important;
+  box-shadow:
+    0 40px 100px rgba(0, 0, 0, 0.55),
+    0 12px 28px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  transform: translateY(28px) scale(0.96) !important;
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 520ms ease !important;
+}
+
+.r-send-modal.open .r-send-dialog {
+  transform: translateY(0) scale(1) !important;
+}
+
+.r-send-close {
+  top: 14px !important;
+  right: 14px !important;
+  width: 36px;
+  height: 36px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px !important;
+  color: rgba(122, 74, 58, 0.6) !important;
+  border-radius: 50% !important;
+  transition: background 240ms ease, color 240ms ease, transform 240ms ease !important;
+}
+
+.r-send-close:hover {
+  background: rgba(212, 69, 60, 0.08) !important;
+  color: #c91d18 !important;
+  transform: rotate(90deg) !important;
+}
+
+.r-send-eyebrow {
+  font-size: 10.5px !important;
+  letter-spacing: 0.42em !important;
+  text-transform: uppercase;
+  color: #b04030 !important;
+  margin-bottom: 18px !important;
+  font-weight: 500;
+}
+
+.r-send-title {
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  font-style: italic;
+  line-height: 1.35 !important;
+  margin: 0 0 28px !important;
+  color: #1f1410 !important;
+  letter-spacing: -0.005em;
+}
+
+.r-send-preview {
+  position: relative;
+  background: rgba(238, 47, 42, 0.04) !important;
+  border-left: 2px solid #d4453c !important;
+  padding: 18px 22px !important;
+  margin-bottom: 32px !important;
+  border-radius: 0 4px 4px 0 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.r-send-preview::before {
+  content: """;
+  position: absolute;
+  top: 4px;
+  left: 14px;
+  font-family: Georgia, serif;
+  font-size: 38px;
+  color: rgba(212, 69, 60, 0.18);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.r-send-memory {
+  margin: 0 !important;
+  font-size: 15px !important;
+  font-style: italic;
+  line-height: 1.6 !important;
+  color: #1f1410 !important;
+  padding-left: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.r-send-attr {
+  margin-top: 12px !important;
+  font-size: 10px !important;
+  letter-spacing: 0.28em !important;
+  text-transform: uppercase;
+  color: #9a6a4a !important;
+  padding-left: 14px;
+}
+
+/* Form */
+
+.r-send-form {
+  gap: 22px !important;
+}
+
+.r-send-label {
+  gap: 8px !important;
+  font-size: 10px !important;
+  letter-spacing: 0.32em !important;
+  color: #7a4a3a !important;
+  font-weight: 500;
+}
+
+.r-send-label em {
+  font-style: italic !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: #b8957a !important;
+  font-size: 10.5px !important;
+  font-weight: 400 !important;
+}
+
+/* Inputs underline style */
+
+.r-send-label input,
+.r-send-label textarea {
+  font-family: Georgia, serif !important;
+  font-size: 16px !important;
+  color: #1f1410 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(122, 74, 58, 0.22) !important;
+  border-radius: 0 !important;
+  padding: 6px 0 10px !important;
+  outline: none !important;
+  transition: border-color 280ms ease, padding-bottom 280ms ease !important;
+  font-style: italic;
+}
+
+.r-send-label input::placeholder,
+.r-send-label textarea::placeholder {
+  color: rgba(122, 74, 58, 0.35) !important;
+  font-style: italic;
+}
+
+.r-send-label input:focus,
+.r-send-label textarea:focus {
+  border-bottom-color: #d4453c !important;
+  border-bottom-width: 1px !important;
+  padding-bottom: 11px !important;
+}
+
+.r-send-label textarea {
+  resize: vertical;
+  min-height: 56px;
+}
+
+.r-send-error {
+  color: #b03020 !important;
+  font-size: 12.5px !important;
+  font-style: italic;
+  min-height: 18px;
+  margin-top: 6px;
+}
+
+/* Submit button — shimmer */
+
+.r-send-submit,
+#pg-result .r-action-btn.primary.r-send-submit {
+  position: relative;
+  width: 100% !important;
+  margin-top: 14px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  padding: 16px 32px !important;
+  font-size: 12.5px !important;
+  font-weight: 500;
+  letter-spacing: 0.22em !important;
+  text-transform: uppercase;
+  color: #fff !important;
+  background: linear-gradient(135deg, #ee2f2a 0%, #c91d18 100%) !important;
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    0 12px 28px rgba(238, 47, 42, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.2) !important;
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 280ms ease,
+              filter 280ms ease !important;
+}
+
+.r-send-submit::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.2) 45%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.2) 55%,
+    transparent 80%
+  );
+  transform: skewX(-18deg);
+  animation: rSendShimmer 4.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  pointer-events: none;
+}
+
+.r-send-submit::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+.r-send-submit:hover {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.05);
+  box-shadow:
+    0 18px 38px rgba(238, 47, 42, 0.42),
+    0 3px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+.r-send-submit:active {
+  transform: translateY(0) scale(0.98) !important;
+  transition-duration: 80ms !important;
+}
+
+@keyframes rSendShimmer {
+  0%, 30% { left: -120%; }
+  70%, 100% { left: 120%; }
+}
+
+.r-send-fineprint {
+  text-align: center;
+  font-size: 10.5px !important;
+  font-style: italic;
+  color: #a08070 !important;
+  margin: 18px 0 0 !important;
+  line-height: 1.55;
+}
+
+/* Success state */
+
+.r-send-success {
+  text-align: center;
+  padding: 16px 0 4px;
+}
+
+.r-send-success-mark {
+  width: 64px !important;
+  height: 64px !important;
+  margin: 0 auto 20px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #ee2f2a 0%, #c91d18 100%) !important;
+  color: #fffcf3 !important;
+  font-size: 30px !important;
+  line-height: 64px !important;
+  font-weight: bold;
+  box-shadow:
+    0 14px 30px rgba(238, 47, 42, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.r-send-success-title {
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  font-style: italic;
+  margin: 0 0 14px !important;
+  color: #1f1410 !important;
+}
+
+.r-send-success-text {
+  font-size: 15px !important;
+  color: #5a3a2a !important;
+  margin: 0 0 22px !important;
+  line-height: 1.55;
+}
+
+.r-send-success-sub {
+  font-size: 12px !important;
+  font-style: italic;
+  color: #9a6a4a !important;
+  line-height: 1.65 !important;
+  margin: 0 auto 28px !important;
+  max-width: 360px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .r-send-submit::before { animation: none; opacity: 0; }
+  .r-send-dialog,
+  .r-send-modal.open .r-send-dialog {
+    transition: opacity 240ms ease !important;
+    transform: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .r-send-dialog {
+    padding: 36px 26px 28px !important;
+  }
+  .r-send-title {
+    font-size: 20px !important;
+  }
+}
