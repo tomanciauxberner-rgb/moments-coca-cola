@@ -1703,3 +1703,196 @@ textarea:focus { border-bottom-color: var(--red); }
   50% { transform: translateY(-12px); }
 }
 /* ===== END can mobile centering fix ===== */
+/* ============================================================
+   AUTO-INJECTED: Page 1 (pitch) polish
+   - Shimmer travelling on .btn-primary
+   - Typographic refinement on em / cadratin
+   - Underline decoration on inline "connect"
+   - Vertical breathing on pitch-label
+   - Decorative divider above pitch-disclaimer
+   ============================================================ */
+
+/* ---------- Button .btn-primary : pill + shimmer + lift ---------- */
+
+#pg-pitch .btn-primary {
+  position: relative;
+  border: 0;
+  border-radius: 999px;
+  padding: 18px 48px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #ee2f2a 0%, #c91d18 100%);
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    0 12px 30px rgba(238, 47, 42, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 280ms ease,
+    filter 280ms ease;
+  margin-top: 12px;
+}
+
+/* The travelling shimmer is a pseudo-element clipped by overflow:hidden */
+#pg-pitch .btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.18) 45%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.18) 55%,
+    transparent 80%
+  );
+  transform: skewX(-18deg);
+  animation: btnPrimaryShimmer 4.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Fine inner border for premium feel */
+#pg-pitch .btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+  z-index: 2;
+}
+
+#pg-pitch .btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow:
+    0 18px 42px rgba(238, 47, 42, 0.38),
+    0 3px 10px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(238, 47, 42, 0.12);
+}
+
+#pg-pitch .btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 80ms;
+}
+
+#pg-pitch .btn-primary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 18px 42px rgba(238, 47, 42, 0.38),
+    0 0 0 4px rgba(255, 255, 255, 0.85);
+}
+
+@keyframes btnPrimaryShimmer {
+  0%, 30% {
+    left: -120%;
+  }
+  70%, 100% {
+    left: 120%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #pg-pitch .btn-primary::before {
+    animation: none;
+    opacity: 0;
+  }
+  #pg-pitch .btn-primary,
+  #pg-pitch .btn-primary:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* ---------- Cadratin refinement on "— human memories." ---------- */
+
+#pg-pitch .pitch-quote em {
+  font-style: italic;
+  letter-spacing: 0.005em;
+  word-spacing: 0.05em;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+}
+
+/* ---------- "connect." inline em : underline decoratif ---------- */
+
+#pg-pitch .pitch-sub em[style*="--red"],
+#pg-pitch .pitch-sub em[style*="red"] {
+  position: relative;
+  display: inline-block;
+  text-decoration: none !important;
+  padding-bottom: 1px;
+}
+
+#pg-pitch .pitch-sub em[style*="--red"]::after,
+#pg-pitch .pitch-sub em[style*="red"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    currentColor 25%,
+    currentColor 75%,
+    transparent 100%
+  );
+  opacity: 0.55;
+  transform: scaleX(0.85);
+  transform-origin: center;
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 420ms ease;
+}
+
+#pg-pitch .pitch-sub em[style*="--red"]:hover::after,
+#pg-pitch .pitch-sub em[style*="red"]:hover::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+/* ---------- pitch-label vertical breathing ---------- */
+
+#pg-pitch .pitch-label {
+  margin-top: 28px;
+  margin-bottom: 22px;
+  letter-spacing: 0.32em;
+  font-size: 11px;
+  opacity: 0.78;
+}
+
+/* ---------- pitch-disclaimer : decorative divider above ---------- */
+
+#pg-pitch .pitch-disclaimer {
+  position: relative;
+  margin-top: 48px;
+  padding-top: 28px;
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  opacity: 0.42;
+}
+
+#pg-pitch .pitch-disclaimer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+}
