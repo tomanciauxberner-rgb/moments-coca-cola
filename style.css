@@ -1896,3 +1896,234 @@ textarea:focus { border-bottom-color: var(--red); }
     transparent 100%
   );
 }
+/* ============================================================
+   AUTO-INJECTED: Page 2 (input) polish
+   - Button shimmer (same as page 1)
+   - Typographic hierarchy
+   - Field underline focus
+   - Pill exemples hover refinement
+   - Back link styled
+   ============================================================ */
+
+/* ---------- Hierarchy : Moments Atlas wordmark + headline ---------- */
+
+#pg-input .input-eyebrow {
+  font-size: 38px;
+  line-height: 1;
+  margin-bottom: 14px;
+  letter-spacing: 0;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+#pg-input .input-headline {
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  margin-bottom: 56px;
+  opacity: 0.92;
+}
+
+/* ---------- Field labels : smaller + tracked ---------- */
+
+#pg-input .field-label {
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* ---------- Field underline focus ---------- */
+
+#pg-input .field-group input,
+#pg-input .field-group textarea {
+  background: transparent;
+  color: #fff;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 8px 0 12px;
+  width: 100%;
+  font-size: 17px;
+  font-family: inherit;
+  font-style: italic;
+  outline: none;
+  transition: border-color 280ms ease;
+}
+
+#pg-input .field-group input::placeholder,
+#pg-input .field-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+  font-style: italic;
+}
+
+#pg-input .field-group input:focus,
+#pg-input .field-group textarea:focus {
+  border-color: rgba(238, 47, 42, 0.7);
+}
+
+#pg-input .field-group textarea {
+  min-height: 32px;
+  resize: vertical;
+}
+
+/* ---------- Pill examples ---------- */
+
+#pg-input .examples-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 36px 0 44px;
+}
+
+#pg-input .ex-pill {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.02);
+  cursor: pointer;
+  transition:
+    color 280ms ease,
+    border-color 280ms ease,
+    background 280ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+}
+
+#pg-input .ex-pill:hover {
+  color: #fff;
+  border-color: rgba(238, 47, 42, 0.75);
+  background: rgba(238, 47, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+#pg-input .ex-pill:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 80ms;
+}
+
+/* ---------- Main button : shimmer + pill (mirror page 1) ---------- */
+
+#pg-input .btn-primary {
+  position: relative;
+  border: 0;
+  border-radius: 999px;
+  padding: 16px 44px;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, #ee2f2a 0%, #c91d18 100%);
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    0 12px 30px rgba(238, 47, 42, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 280ms ease,
+    filter 280ms ease;
+  margin-top: 8px;
+}
+
+#pg-input .btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.18) 45%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.18) 55%,
+    transparent 80%
+  );
+  transform: skewX(-18deg);
+  animation: btnInputShimmer 4.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#pg-input .btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+  z-index: 2;
+}
+
+#pg-input .btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  box-shadow:
+    0 18px 42px rgba(238, 47, 42, 0.38),
+    0 3px 10px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(238, 47, 42, 0.12);
+}
+
+#pg-input .btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 80ms;
+}
+
+#pg-input .btn-primary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 18px 42px rgba(238, 47, 42, 0.38),
+    0 0 0 4px rgba(255, 255, 255, 0.85);
+}
+
+@keyframes btnInputShimmer {
+  0%, 30% { left: -120%; }
+  70%, 100% { left: 120%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #pg-input .btn-primary::before { animation: none; opacity: 0; }
+  #pg-input .btn-primary,
+  #pg-input .btn-primary:hover { transition: none; transform: none; }
+}
+
+/* ---------- Back link refined ---------- */
+
+#pg-input .btn-ghost {
+  background: transparent;
+  border: 0;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  padding: 16px 24px;
+  margin-top: 16px;
+  cursor: pointer;
+  transition: color 240ms ease, letter-spacing 240ms ease;
+}
+
+#pg-input .btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.36em;
+}
+
+/* ---------- Layout breathing ---------- */
+
+#pg-input .input-inner {
+  max-width: 720px;
+  padding: 64px 32px 80px;
+}
+
+#pg-input .field-group {
+  margin-bottom: 20px;
+}
